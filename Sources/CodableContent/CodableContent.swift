@@ -18,11 +18,9 @@ public struct CodableGroup: CodableComponent {
     public static let type = CodableComponentType.group
     public var id: String { components.first?.id ?? UUID().uuidString }
     public let components: [AnyCodableComponent]
-    public var isProminent = false
 
-    public init(_ components: [AnyCodableComponent], isProminent: Bool = false) {
+    public init(_ components: [AnyCodableComponent]) {
         self.components = components
-        self.isProminent = isProminent
     }
 }
 
