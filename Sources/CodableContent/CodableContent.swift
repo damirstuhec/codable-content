@@ -101,7 +101,7 @@ public protocol CodableComponent: Codable {
 // MARK: - AnyCodableComponent
 
 public struct AnyCodableComponent: Codable {
-    let component: CodableComponent
+    public let component: CodableComponent
 
     public init(component: CodableComponent) {
         self.component = component
@@ -126,7 +126,7 @@ public struct AnyCodableComponent: Codable {
 }
 
 extension AnyCodableComponent: Equatable {
-    var id: String { component.id }
+    public var id: String { component.id }
 
     public static func == (lhs: AnyCodableComponent, rhs: AnyCodableComponent) -> Bool {
         return lhs.id == rhs.id
