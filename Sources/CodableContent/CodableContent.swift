@@ -6,6 +6,10 @@ public struct CodableHStack: CodableComponent {
     public static let type = CodableComponentType.hstack
     public var id: String { components.first?.id ?? UUID().uuidString }
     public let components: [AnyCodableComponent]
+
+    public init(_ components: [AnyCodableComponent]) {
+        self.components = components
+    }
 }
 
 // MARK: - Group
@@ -13,8 +17,13 @@ public struct CodableHStack: CodableComponent {
 public struct CodableGroup: CodableComponent {
     public static let type = CodableComponentType.group
     public var id: String { components.first?.id ?? UUID().uuidString }
-    public var isProminent = false
     public let components: [AnyCodableComponent]
+    public var isProminent = false
+
+    public init(_ components: [AnyCodableComponent], isProminent: Bool = false) {
+        self.components = components
+        self.isProminent = isProminent
+    }
 }
 
 // MARK: - Image
@@ -23,6 +32,10 @@ public struct CodableImage: CodableComponent {
     public static let type = CodableComponentType.image
     public var id: String { url }
     public let url: String
+
+    public init(url: String) {
+        self.url = url
+    }
 }
 
 // MARK: - Text
@@ -38,12 +51,21 @@ public struct CodableText: CodableComponent {
     public var id: String { text }
     public let text: String
     public var style = Style.body
+
+    public init(text: String, style: Style = .body) {
+        self.text = text
+        self.style = style
+    }
 }
 
 // MARK: - Button
 
 public struct CodableButtonAction: Hashable, Codable {
     public let identifier: String
+
+    public init(_ identifier: String) {
+        self.identifier = identifier
+    }
 }
 
 extension CodableButtonAction: ExpressibleByStringLiteral {
@@ -62,10 +84,17 @@ public extension CodableButtonAction {
 public struct CodableButton: CodableComponent {
     public static let type = CodableComponentType.button
     public var id: String { title }
-    public let action: CodableButtonAction
     public let title: String
     public var subtitle: String? = nil
+    public let action: CodableButtonAction
     public var url: String? = nil
+
+    public init(_ title: String, subtitle: String? = nil, action: CodableButtonAction, url: String? = nil) {
+        self.title = title
+        self.subtitle = subtitle
+        self.action = action
+        self.url = url
+    }
 }
 
 // MARK: - CodableComponent
@@ -103,7 +132,7 @@ public protocol CodableComponent: Codable {
 public struct AnyCodableComponent: Codable {
     public let component: CodableComponent
 
-    public init(component: CodableComponent) {
+    public init(_ component: CodableComponent) {
         self.component = component
     }
 
