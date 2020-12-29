@@ -4,36 +4,21 @@ import Foundation
 
 public struct CodableHStack: CodableComponent {
     public static let type = CodableComponentType.hstack
-    public var id: String { components.first?.id ?? UUID().uuidString }
     public let components: [AnyCodableComponent]
-
-    public init(_ components: [AnyCodableComponent]) {
-        self.components = components
-    }
 }
 
-// MARK: - Group
+// MARK: - VStack
 
-public struct CodableGroup: CodableComponent {
-    public static let type = CodableComponentType.group
-    public var id: String { components.first?.id ?? UUID().uuidString }
+public struct CodableVStack: CodableComponent {
+    public static let type = CodableComponentType.vstack
     public let components: [AnyCodableComponent]
-
-    public init(_ components: [AnyCodableComponent]) {
-        self.components = components
-    }
 }
 
 // MARK: - Image
 
 public struct CodableImage: CodableComponent {
     public static let type = CodableComponentType.image
-    public var id: String { url }
     public let url: String
-
-    public init(url: String) {
-        self.url = url
-    }
 }
 
 // MARK: - Text
@@ -46,24 +31,14 @@ public struct CodableText: CodableComponent {
     }
 
     public static let type = CodableComponentType.text
-    public var id: String { text }
     public let text: String
     public var style = Style.body
-
-    public init(text: String, style: Style = .body) {
-        self.text = text
-        self.style = style
-    }
 }
 
 // MARK: - Button
 
 public struct CodableButtonAction: Hashable, Codable {
     public let identifier: String
-
-    public init(_ identifier: String) {
-        self.identifier = identifier
-    }
 }
 
 extension CodableButtonAction: ExpressibleByStringLiteral {
@@ -81,25 +56,17 @@ public extension CodableButtonAction {
 
 public struct CodableButton: CodableComponent {
     public static let type = CodableComponentType.button
-    public var id: String { title }
     public let title: String
     public var subtitle: String? = nil
     public let action: CodableButtonAction
     public var url: String? = nil
-
-    public init(_ title: String, subtitle: String? = nil, action: CodableButtonAction, url: String? = nil) {
-        self.title = title
-        self.subtitle = subtitle
-        self.action = action
-        self.url = url
-    }
 }
 
 // MARK: - CodableComponent
 
 public enum CodableComponentType: String, Codable {
     case hstack
-    case group
+    case vstack = "group" // Backwards compatibility
     case image
     case text
     case button
@@ -108,8 +75,8 @@ public enum CodableComponentType: String, Codable {
         switch self {
         case .hstack:
             return CodableHStack.self
-        case .group:
-            return CodableGroup.self
+        case .vstack:
+            return CodableVStack.self
         case .image:
             return CodableImage.self
         case .text:
@@ -122,7 +89,6 @@ public enum CodableComponentType: String, Codable {
 
 public protocol CodableComponent: Codable {
     static var type: CodableComponentType { get }
-    var id: String { get }
 }
 
 // MARK: - AnyCodableComponent
@@ -152,10 +118,24 @@ public struct AnyCodableComponent: Codable {
     }
 }
 
-extension AnyCodableComponent: Equatable {
-    public var id: String { component.id }
+public extension AnyCodableComponent {
+    static func hstack(_ components: [AnyCodableComponent]) -> AnyCodableComponent {
+        AnyCodableComponent(CodableHStack(components: components))
+    }
 
-    public static func == (lhs: AnyCodableComponent, rhs: AnyCodableComponent) -> Bool {
-        return lhs.id == rhs.id
+    static func vstack(_ components: [AnyCodableComponent]) -> AnyCodableComponent {
+        AnyCodableComponent(CodableVStack(components: components))
+    }
+
+    static func image(url: String) -> AnyCodableComponent {
+        AnyCodableComponent(CodableImage(url: url))
+    }
+
+    static func text(_ text: String, _ style: CodableText.Style = .body) -> AnyCodableComponent {
+        AnyCodableComponent(CodableText(text: text, style: style))
+    }
+
+    static func button(title: String, subtitle: String? = nil, _ action: CodableButtonAction, url: String? = nil) -> AnyCodableComponent {
+        AnyCodableComponent(CodableButton(title: title, subtitle: subtitle, action: action, url: url))
     }
 }
